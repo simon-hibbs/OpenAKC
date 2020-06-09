@@ -4,8 +4,8 @@
 # Constants
 #
 source /etc/os-release
-VERSION="0.98"
-BUILD="6"
+VERSION="0.99"
+BUILD="3"
 
 #
 # Package requirements for build
@@ -130,11 +130,11 @@ cp bin/openakc-plugin.x "${PDIR}/usr/sbin/openakc-plugin"
 cp LICENSE "${PDIR}/usr/share/doc/openakc/"
 cp LICENSE-hpenc "${PDIR}/usr/share/doc/openakc/"
 cp LICENSE-libsodium "${PDIR}/usr/share/doc/openakc/"
-cp README "${PDIR}/usr/share/doc/openakc/"
+cp QUICKSTART.txt "${PDIR}/usr/share/doc/openakc/"
 #
-chmod 750 "${PDIR}/var/lib/openakc"
-chmod 750 "${PDIR}/etc/openakc"
-chmod 640 "${PDIR}/etc/openakc/openakc.conf"
+chmod 755 "${PDIR}/var/lib/openakc"
+chmod 755 "${PDIR}/etc/openakc"
+chmod 644 "${PDIR}/etc/openakc/openakc.conf"
 
 #
 echo "Package: openakc" > "${PDIR}/DEBIAN/control"
@@ -161,7 +161,7 @@ mkdir -p "${PDIR}/usr/share/doc/openakc-tools"
 #
 cp bin/openakc "${PDIR}/usr/bin/openakc"
 cp LICENSE "${PDIR}/usr/share/doc/openakc-tools/"
-cp README "${PDIR}/usr/share/doc/openakc-tools/"
+cp QUICKSTART.txt "${PDIR}/usr/share/doc/openakc-tools/"
 #
 chmod 755 "${PDIR}/usr/bin/openakc"
 
@@ -203,11 +203,11 @@ cp resources/openakc-xinetd "${PDIR}/etc/xinetd.d/openakc"
 cp LICENSE "${PDIR}/usr/share/doc/openakc-server/"
 cp LICENSE-hpenc "${PDIR}/usr/share/doc/openakc-server/"
 cp LICENSE-libsodium "${PDIR}/usr/share/doc/openakc-server/"
-cp README "${PDIR}/usr/share/doc/openakc-server/"
+cp QUICKSTART.txt "${PDIR}/usr/share/doc/openakc-server/"
 
 #
-chmod 440 "${PDIR}/etc/sudoers.d/openakc"
-chmod 644 "${PDIR}/etc/xinetd.d/openakc"
+chmod 640 "${PDIR}/etc/sudoers.d/openakc"
+chmod 640 "${PDIR}/etc/xinetd.d/openakc"
 
 #
 echo "Package: openakc-server" > "${PDIR}/DEBIAN/control"
