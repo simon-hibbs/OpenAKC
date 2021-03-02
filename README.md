@@ -1,19 +1,29 @@
-# OpenAKC
+# OpenAKC (Homepage & Downloads [HERE][homepage])
 
-##### Do you have wish you could take control of your SSH trust, stop users from altering or adding trust relationships inside your environment and control when, or how keys can be used?
-
-##### Do you wish you could meet your security teams requirements for identifying which users are accessing role accounts (or even root accounts) without needing to join a directory such as AD or LDAP on every server, with the management overhead that brings?
-
-##### Do you wish your users could manage their own private keys and you didn't need to keep track which personal key grants access where and who owns it?
-
-##### Do you wish you could instantly update or remove a key across an entire estate, without even having to log in to the servers in question?
-
-##### Do you wish you could protect critical system files, or user data from junior sysadmins?
+<img src="https://raw.githubusercontent.com/netlore/OpenAKC/master/docs/resources/OpenAKCKeys-short.jpg">
 
 #### OpenAKC provides SSH "Self Service SSH key management for users", "Centralised SSH Key Management for static trust" and can offer advanced features for tracking, auditing and controlling what users (and sysadmins) do.
 
+* Centrally control all of your SSH trust.
 
-It a can be used as a stand alone tool or as part of a more advanced "Privilaged Access Management" tool if integrated with a system for approving access, either via a directory such as AD / LDAP or direcetly via the API.
+* Stop users from altering or adding trust relationships.
+
+* Control when, and how keys can be used.
+
+* Meet security best practice requirements related to logging privilage escalation without needing to roll out a directory such as AD or LDAP across your entire estate.
+
+* Allow users to manage their own SSH key pairs and use those keys to access role accounts based on rules you define.
+
+* Centrally manage static trust without having to deal with "authorized_keys" files spread across your estate.
+
+* Instantly update or remove a key across an entire estate, without even having to log in to the servers in question.
+
+* Define rules for access to servers that are not yet configured
+
+* Creative use of the interface to "Linux Capabilities" allows you to apply controls other systems can only dream of. Protect critical system files, or user data from junior sysadmins and oportunistic developers alike.... the possibilities are endless.
+
+
+OpenAKC is a building block which can be used as a stand alone tool or as part of an integrated "Privilaged Access Management" tool if combined with a system for approving access, either via a directory such as AD / LDAP or direcetly via the API, perhaps from a web application.
 
 With a client server model, you are free to completely disable local ssh authentication methods your users might leverage to bypass access control!  Confound your troublesome users, or hackers with ssh configuration like this:-
 
@@ -62,9 +72,9 @@ Examples:
 
 You no-longer have to require users to log in to servers with personal accounts and escalate privilages just to ensure complete logging.  OpenAKC relieves you from managing user permissions, home folders, and authentication across large numbers of machines while ensuring detailed records showing which users accessed which servers, and what they did!
 
-WARNING: This is pre-release software and although it is functional, plenty of work remains to ensure it is robust and secure.
+**WARNING: This is pre-release software and although it is functional, we would definitely ask for feedback and suggest that caution be taken with any large deployments prior to the final release of 1.0.0**
 
-Documentation is still being created, but you may like to see an [impromptu demo video][demo].
+Documentation is available [Here][docs], or you may like to see our YouTube channel [OpenAKC Videos][demo], I won't be offended if you want to play some of these at double speed.
 
 Any contributions of in regard to documentation, code or suggestions would be greatly appreciated.
 
@@ -72,5 +82,7 @@ Please note that most of this tool is created using shell code, I hope this make
 
 
 
-[demo]: https://www.youtube.com/watch?v=r2hv-WivqHY
+[demo]: https://www.youtube.com/channel/UCI1hoep-rTNVggG25jHkbiA
 [caps]: https://man7.org/linux/man-pages/man7/capabilities.7.html
+[homepage]: https://netlore.github.io/OpenAKC/
+[docs]: https://github.com/netlore/OpenAKC/blob/master/docs/OpenAKC_Admin_Guide.pdf

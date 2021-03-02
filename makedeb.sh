@@ -4,8 +4,8 @@
 # Constants
 #
 source /etc/os-release
-VERSION="0.99"
-BUILD="8"
+VERSION="1.0.0~alpha18"
+BUILD="1"
 
 #
 # Package requirements for build
@@ -118,13 +118,16 @@ mkdir -p "${PDIR}/var/lib/openakc"
 mkdir -p "${PDIR}/usr/sbin"
 mkdir -p "${PDIR}/usr/bin"
 mkdir -p "${PDIR}/usr/share/doc/openakc"
+mkdir -p "${PDIR}/etc/rsyslog.d"
 #
 cp resources/openakc.conf "${PDIR}/etc/openakc/"
+cp resources/openakc.conf.readme "${PDIR}/etc/openakc/"
 cp bin/openakc-cap "${PDIR}/usr/bin/openakc-cap"
 cp bin/openakc-hpenc "${PDIR}/usr/bin/openakc-hpenc"
 cp bin/openakc-session.x "${PDIR}/usr/bin/openakc-session"
+cp resources/deb_prerm "${PDIR}/DEBIAN/prerm"
 cp resources/deb_preinst "${PDIR}/DEBIAN/preinst"
-cp resources/deb_postinst "${PDIR}/DEBIAN/postinst"
+sed -e "s,%RELEASE%,$RELEASE,g" resources/deb_postinst > "${PDIR}/DEBIAN/postinst"
 cp resources/deb_postrm "${PDIR}/DEBIAN/postrm"
 cp bin/openakc-plugin.x "${PDIR}/usr/sbin/openakc-plugin"
 cp LICENSE "${PDIR}/usr/share/doc/openakc/"
@@ -135,12 +138,15 @@ cp QUICKSTART.txt "${PDIR}/usr/share/doc/openakc/"
 chmod 755 "${PDIR}/var/lib/openakc"
 chmod 755 "${PDIR}/etc/openakc"
 chmod 644 "${PDIR}/etc/openakc/openakc.conf"
+chmod 644 "${PDIR}/etc/openakc/openakc.conf.readme"
+chmod 755 "${PDIR}/DEBIAN/postinst"
 
 #
 echo "Package: openakc" > "${PDIR}/DEBIAN/control"
 echo "Version: ${VERSION}-${BUILD}" >> "${PDIR}/DEBIAN/control"
 echo "Maintainer: A. James Lewis <james@fsck.co.uk>" >> "${PDIR}/DEBIAN/control"
-echo "Depends: openssh-server (>= 7.0), openssh-client (>= 7.0), bash (>= 3.2), openssl (>= 0.9.8), coreutils, hostname, debianutils, e2fsprogs, libcap2" >> "${PDIR}/DEBIAN/control"
+echo "Depends: openssh-server (>= 7.0), openssh-client (>= 7.0), bash (>= 3.2), openssl (>= 0.9.8), openakc-shared, coreutils, hostname, debianutils, e2fsprogs, libcap2" >> "${PDIR}/DEBIAN/control"
+echo "Conflicts: openakc-server" >> "${PDIR}/DEBIAN/control"
 echo "Homepage: http://www.fsck.co/uk/openakc/" >> "${PDIR}/DEBIAN/control"
 echo "Architecture: amd64" >> "${PDIR}/DEBIAN/control"
 echo "Description: OpenAKC Agent" >> "${PDIR}/DEBIAN/control"
@@ -158,10 +164,10 @@ PDIR="openakc-tools_${RELEASE}_amd64"
 mkdir -p "${PDIR}/DEBIAN"
 mkdir -p "${PDIR}/usr/bin"
 mkdir -p "${PDIR}/usr/share/doc/openakc-tools"
+mkdir -p "${PDIR}/etc/rsyslog.d"
 #
 cp bin/openakc "${PDIR}/usr/bin/openakc"
 cp LICENSE "${PDIR}/usr/share/doc/openakc-tools/"
-cp QUICKSTART.txt "${PDIR}/usr/share/doc/openakc-tools/"
 #
 chmod 755 "${PDIR}/usr/bin/openakc"
 
@@ -169,7 +175,7 @@ chmod 755 "${PDIR}/usr/bin/openakc"
 echo "Package: openakc-tools" > "${PDIR}/DEBIAN/control"
 echo "Version: ${VERSION}-${BUILD}" >> "${PDIR}/DEBIAN/control"
 echo "Maintainer: A. James Lewis <james@fsck.co.uk>" >> "${PDIR}/DEBIAN/control"
-echo "Depends: bash (>= 3.2), openssl (>= 0.9.8), coreutils, hostname, sudo, debianutils" >> "${PDIR}/DEBIAN/control"
+echo "Depends: bash (>= 3.2), openssl (>= 0.9.8), openakc-shared, coreutils, hostname, sudo, debianutils" >> "${PDIR}/DEBIAN/control"
 echo "Homepage: http://www.fsck.co.uk/openakc/" >> "${PDIR}/DEBIAN/control"
 echo "Architecture: amd64" >> "${PDIR}/DEBIAN/control"
 echo "Description: OpenAKC API Tools" >> "${PDIR}/DEBIAN/control"
@@ -191,15 +197,20 @@ mkdir -p "${PDIR}/usr/sbin"
 mkdir -p "${PDIR}/usr/bin"
 mkdir -p "${PDIR}/etc/sudoers.d"
 mkdir -p "${PDIR}/etc/xinetd.d"
+mkdir -p "${PDIR}/lib/systemd/system"
 mkdir -p "${PDIR}/usr/share/doc/openakc-server"
+
 #
 cp bin/openakc-hpenc "${PDIR}/usr/bin/openakc-hpenc"
 cp bin/openakc-server.x "${PDIR}/usr/sbin/openakc-server"
 cp resources/deb_postinst-server "${PDIR}/DEBIAN/postinst"
 cp resources/deb_postrm-server "${PDIR}/DEBIAN/postrm"
+cp resources/deb_preinst-server "${PDIR}/DEBIAN/preinst"
 cp resources/openakc-sudoers "${PDIR}/etc/sudoers.d/openakc"
 cp resources/openakc-xinetd "${PDIR}/etc/xinetd.d/openakc"
-#cp docs/OpenAKC.pdf "${PDIR}/usr/share/doc/openakc/"
+cp resources/openakc@.service "${PDIR}/lib/systemd/system/"
+cp resources/openakc.socket "${PDIR}/lib/systemd/system/"
+cp docs/OpenAKC_Admin_Guide.pdf "${PDIR}/usr/share/doc/openakc-server/"
 cp LICENSE "${PDIR}/usr/share/doc/openakc-server/"
 cp LICENSE-hpenc "${PDIR}/usr/share/doc/openakc-server/"
 cp LICENSE-libsodium "${PDIR}/usr/share/doc/openakc-server/"
@@ -208,15 +219,60 @@ cp QUICKSTART.txt "${PDIR}/usr/share/doc/openakc-server/"
 #
 chmod 640 "${PDIR}/etc/sudoers.d/openakc"
 chmod 640 "${PDIR}/etc/xinetd.d/openakc"
+chmod 644 "${PDIR}/lib/systemd/system/openakc@.service"
+chmod 644 "${PDIR}/lib/systemd/system/openakc.socket"
 
 #
 echo "Package: openakc-server" > "${PDIR}/DEBIAN/control"
 echo "Version: ${VERSION}-${BUILD}" >> "${PDIR}/DEBIAN/control"
 echo "Maintainer: A. James Lewis <james@fsck.co.uk>" >> "${PDIR}/DEBIAN/control"
-echo "Depends: openssh-client (>= 7.0), bash (>= 3.2), openssl (>= 0.9.8), coreutils, xinetd, openakc-tools" >> "${PDIR}/DEBIAN/control"
+echo "Depends: openssh-client (>= 7.0), bash (>= 3.2), openssl (>= 0.9.8), openakc-shared, coreutils, openakc-tools" >> "${PDIR}/DEBIAN/control"
+echo "Conflicts: openakc" >> "${PDIR}/DEBIAN/control"
 echo "Homepage: http://www.fsck.co/uk/openakc/" >> "${PDIR}/DEBIAN/control"
 echo "Architecture: amd64" >> "${PDIR}/DEBIAN/control"
 echo "Description: OpenAKC API Server" >> "${PDIR}/DEBIAN/control"
+#
+dpkg-deb --build "${PDIR}"
+
+rm -fr "${PDIR}"
+
+#
+# Build Shared Package
+#
+cd $BDIR || exit 1
+PDIR="openakc-shared_${RELEASE}_amd64"
+#
+mkdir -p "${PDIR}/DEBIAN"
+mkdir -p "${PDIR}/var/lib/openakc/libexec"
+mkdir -p "${PDIR}/usr/share/doc/openakc-shared"
+mkdir -p "${PDIR}/etc/rsyslog.d"
+#
+cp bin/openakc-functions "${PDIR}/var/lib/openakc/libexec/functions-${RELEASE}"
+cp resources/openakc-rsyslog "${PDIR}/etc/rsyslog.d/99-openakc.conf"
+#cp resources/deb_preinst-shared "${PDIR}/DEBIAN/preinst"
+sed -e "s,%RELEASE%,$RELEASE,g" resources/deb_preinst-shared > "${PDIR}/DEBIAN/preinst"
+sed -e "s,%RELEASE%,$RELEASE,g" resources/deb_postinst-shared > "${PDIR}/DEBIAN/postinst"
+sed -e "s,%RELEASE%,$RELEASE,g" resources/deb_prerm-shared > "${PDIR}/DEBIAN/prerm"
+cp resources/deb_postrm-shared "${PDIR}/DEBIAN/postrm"
+cp LICENSE "${PDIR}/usr/share/doc/openakc-shared/"
+#
+##chmod 755 "${PDIR}/usr/bin/openakc"
+chmod 640 "${PDIR}/etc/rsyslog.d/99-openakc.conf"
+chmod 644 "${PDIR}/var/lib/openakc/libexec/functions-${RELEASE}"
+chmod 755 "${PDIR}/var/lib/openakc/libexec"
+chmod 755 "${PDIR}/DEBIAN/preinst"
+chmod 755 "${PDIR}/DEBIAN/postinst"
+chmod 755 "${PDIR}/DEBIAN/prerm"
+chmod 755 "${PDIR}/DEBIAN/postrm"
+
+#
+echo "Package: openakc-shared" > "${PDIR}/DEBIAN/control"
+echo "Version: ${VERSION}-${BUILD}" >> "${PDIR}/DEBIAN/control"
+echo "Maintainer: A. James Lewis <james@fsck.co.uk>" >> "${PDIR}/DEBIAN/control"
+echo "Depends: bash (>= 3.2), openssl (>= 0.9.8), coreutils, e2fsprogs" >> "${PDIR}/DEBIAN/control"
+echo "Homepage: http://www.fsck.co.uk/openakc/" >> "${PDIR}/DEBIAN/control"
+echo "Architecture: amd64" >> "${PDIR}/DEBIAN/control"
+echo "Description: OpenAKC Shared Components" >> "${PDIR}/DEBIAN/control"
 #
 dpkg-deb --build "${PDIR}"
 

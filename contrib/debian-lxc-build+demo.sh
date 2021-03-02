@@ -23,8 +23,8 @@
 # User Config
 #
 SUBID="100000" # Update by adding 100000 if range in use.
-CONTAINEROPTS="-d $(lsb_release -si | tr 'A-Z' 'a-z') -r $(lsb_release -sc | tr 'A-Z' 'a-z') -a amd64"
-#CONTAINEROPTS="-d ubuntu -r bionic -a amd64" # Set null to be asked.
+#CONTAINEROPTS="-d $(lsb_release -si | tr 'A-Z' 'a-z') -r $(lsb_release -sc | tr 'A-Z' 'a-z') -a amd64"
+CONTAINEROPTS="-d ubuntu -r focal -a amd64" # Set null to be asked.
 #
 
 #
@@ -296,6 +296,16 @@ if [ ${REBUILD} -eq 1 ]; then
   echo
  fi
 #
+ if [ "x${MODE}" == "xunprivilaged" ]; then
+  LXCROOT="${HOME}/.local/share/lxc"
+ else
+  LXCROOT="/var/lib/lxc"
+  chattr -R -i /var/lib/lxc/openakc-combined 2> /dev/null
+  chattr -R -i /var/lib/lxc/openakc-client 2> /dev/null
+  chattr -R -a /var/lib/lxc/openakc-combined 2> /dev/null
+  chattr -R -a /var/lib/lxc/openakc-client 2> /dev/null
+ fi
+ #
  echo "Destroying old containers..."
  echo
  printf "${WHITE}"
@@ -332,12 +342,6 @@ fi
 #
 # OK, lets get our containers ready to use, and build our packages
 #
-if [ "x${MODE}" == "xunprivilaged" ]; then
- LXCROOT="${HOME}/.local/share/lxc"
-else
- LXCROOT="/var/lib/lxc"
-fi
-#
 if [ ${DNSFIX} -eq 1 ]; then
  printf "${CYAN}Applying DNS fix to containers${WHITE}\n"
  echo
@@ -354,13 +358,15 @@ echo
 lxc-attach -n openakc-combined -- apt update
 lxc-attach -n openakc-combined -- apt -q -y dist-upgrade
 lxc-attach -n openakc-combined -- apt -q -y install build-essential unzip libcap-dev libssl-dev
+lxc-attach -n openakc-combined -- apt -q -y install joe
 lxc-attach -n openakc-combined -- apt -q -y install xinetd openssl sudo
 #
 lxc-attach -n openakc-client -- apt update
 lxc-attach -n openakc-client -- apt -q -y dist-upgrade
+lxc-attach -n openakc-client -- apt -q -y install joe
 lxc-attach -n openakc-client -- apt -q -y install openssh-server openssl sudo
 #
-if [ ! -f "${SCRIPTPATH}/../openakc.spec" ]; then
+if [ ! -f "${SCRIPTPATH}/../openakc-rhel.spec" ]; then
  printf "${CYAN}Can't find source code, exiting.${WHITE}\n"
  echo
  exit 1
@@ -403,16 +409,16 @@ fi
 #
 if [ ${INSTALL} -eq 1 ]; then
  COMBINED=$(lxc-attach -n openakc-client -- find /tmp/OpenAKC | grep "deb$" | grep "openakc-" | tr '\n' ' ')
- CLIENT=$(lxc-attach -n openakc-client -- find /tmp/OpenAKC | grep "deb$" | grep "openakc_" | tr '\n' ' ')
+ CLIENT=$(lxc-attach -n openakc-client -- find /tmp/OpenAKC | grep "deb$" | egrep "openakc_|openakc-shared" | tr '\n' ' ')
  printf "${CYAN}Installing packages in container \"openakc-combined\"${WHITE}\n"
  echo
- lxc-attach -n openakc-combined -- su - -c "dpkg -P openakc-tools openakc-server" 2> /dev/null
+ lxc-attach -n openakc-combined -- su - -c "dpkg -P openakc-tools openakc-server openakc-shared" 2> /dev/null
  lxc-attach -n openakc-combined -- su - -c "dpkg -i ${COMBINED}"
  echo
  echo
  printf "${CYAN}Installing packages in container \"openakc-client\"${WHITE}\n"
  echo
- lxc-attach -n openakc-client -- su - -c "dpkg -P openakc" 2> /dev/null
+ lxc-attach -n openakc-client -- su - -c "dpkg -P openakc openakc-shared" 2> /dev/null
  lxc-attach -n openakc-client -- su - -c "dpkg -i ${CLIENT}"
  echo
  echo
